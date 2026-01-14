@@ -1,0 +1,64 @@
+/*  Ethereal Ivory      #E4E4DE
+    Sophisticated Sage  #C4C5BA
+    Eerie Black         #1B1B1B
+    Muted Moss          #595f39 
+*/
+
+body{
+    background-color: #C4C5BA;
+}
+
+.full-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.heading {
+    color: black;
+    font-size: 50px;
+    padding: 50px;
+}
+
+.calculator-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #1B1B1B;
+    padding: 10px;
+    border-radius: 15px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+#display {
+    height: 50px;
+    width: 90%;
+    padding: 10px;
+    /* margin-top: ; */
+    margin-bottom: 20px;
+    background-color:#595f39;
+    border-radius: 15px;
+    border: 3px outset #1B1B1B;
+    box-shadow: 2px 2px #C4C5BA;
+}
+
+button {
+    font-size: 18px;
+    padding: 20px 20px;
+    margin: 5px;
+    width: 70px;
+    height: 70px;
+    color: #C4C5BA;
+    border: 3px outset #595f39;
+    box-shadow: 2px 2px #595f39;
+    background-color: #1B1B1B;
+    border-radius: 15px;
+    text-align: center;
+}
