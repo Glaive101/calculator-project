@@ -1,5 +1,6 @@
 let displayValue = '';
 let calculatorDisplayElement = document.querySelector('#display');
+let operatorSelected = false;
 
 const idToValue ={
     'zero': 0,
@@ -28,7 +29,7 @@ let buttonIDArray = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seve
 let calculations = {
     firstValue: [],
     secondValue: [],
-    operator: '+',
+    operator: '',
     accumulator: 0,
     add: function() {
         return this.firstValue + this.secondValue;
@@ -63,51 +64,20 @@ let calculations = {
     }
 }
 
-// buttonIDArray.forEach((id, index) => {
-//     let currentButton = document.querySelector(`#${id}`);
-
-//     switch(id){
-//         case 'zero':
-//             currentButton.addEventListener("click", () => {
-//                 console.log(`Number passed: ${0}`);
-//                 return 0;
-//             });
-//         case 'one':
-//             currentButton.addEventListener("click", () => {
-//                 console.log(`Number passed: ${1}`);
-//                 return 1;
-//             });
-//         case 'two':
-//             currentButton.addEventListener("click", () => {
-//                 console.log(`Number passed: ${2}`);
-//                 return 2;
-//             });
-//         case 'three':
-//             currentButton.addEventListener("click", () => {
-//                 console.log(`Number passed: ${3}`);
-//                 return 3;
-//             });
-//         case 'four':
-//             currentButton.addEventListener("click", () => {
-//                 console.log(`Number passed: ${4}`);
-//                 return 4;
-//             });
-//     }
-// });
-
 function handleButtonPressEvent(inputValue){
-    let operatorSelected = false;
-
-    //Handle if value entered is integer
     if(Number.isInteger(inputValue)){
-        calculations['firstValue'].push(inputValue);
-        displayValue = calculations.firstValue.join('');
-        calculatorDisplayElement.textContent = `${displayValue}`;
+        if(!operatorSelected){
+            calculations['firstValue'].push(inputValue);
+            console.log(calculations.firstValue);
+        } else {
+            calculations['secondValue'].push(inputValue);
+        }
+        
     } else {
+        operatorSelected = true;
         switch(inputValue){
             case '+':
                 calculations.operator = inputValue;
-                console.log(calculations.operator);
         }
     }
 }
@@ -115,35 +85,11 @@ function handleButtonPressEvent(inputValue){
 buttonIDArray.forEach((id) => {
     let currentButton = document.querySelector(`#${id}`);
     currentButton.addEventListener("click", () => {
-        let value = handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
-        //console.log(value);
+        handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
+
+        //Display the value that was just entered
+        console.log(`${calculations.firstValue.join('')} ${calculations.operator} ${calculations.secondValue.join('')}`)
+        calculatorDisplayElement.textContent = 
+        `${calculations.firstValue.join('')} ${calculations.operator} ${calculations.secondValue.join('')}`;
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*******************************************************************/
-/*First attempt at dynamically assigning eventlisteners to buttons */
-/*******************************************************************/
-
-// let buttonIDArray = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
-
-// buttonIDArray.forEach((id, index) => {
-//     let currentButton = document.querySelector(`#${id}`);
-//     currentButton.addEventListener("click", () => {
-//         console.log(`Number passed: ${counter}`);
-    
-//     });
-// });
