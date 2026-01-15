@@ -65,13 +65,24 @@ let calculations = {
 }
 
 function handleButtonPressEvent(inputValue){
+
+    if(inputValue === 'B'){
+        if(!operatorSelected){
+            calculations.firstValue.pop();
+        } else {
+            calculations.secondValue.pop();
+        }
+        return;
+    }
+
     if(Number.isInteger(inputValue)){
         if(!operatorSelected){
             calculations['firstValue'].push(inputValue);
+            return;
         } else {
             calculations['secondValue'].push(inputValue);
+            return;
         }
-        
     } else {
         operatorSelected = true;
         switch(inputValue){
@@ -90,9 +101,23 @@ function handleButtonPressEvent(inputValue){
             case '=':
                 calculations.accumulator = calculations.operation();
                 console.log(calculations.accumulator);
-                calculations.firstValue = String(calculations.accumulator)
+
+                if(calculations.accumulator%1 !== 0){
+                    let nonNumber = String(calculations.accumulator)
                                           .split('').map(digit => Number.parseInt(digit));
+                    calculations.firstValue = String(nonNumber).replace(/Nan/g, ".");
+                } else {
+                    calculations.firstValue = String(calculations.accumulator)
+                                          .split('').map(digit => Number.parseInt(digit));
+                }
+
                 calculations.secondValue = [];
+                break;
+            case 'C':
+                calculations.firstValue = [];
+                calculations.secondValue = [];
+                calculations.operator = '';
+                calculations.accumulator = 0;   
                 break;
             default:
                 console.log("Nothing");
