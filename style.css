@@ -37,6 +37,11 @@ body{
     justify-content: space-around;
 }
 
+#bottom-row {
+    width: 100%;
+    justify-content: left;
+}
+
 #display {
     height: 50px;
     width: 90%;
