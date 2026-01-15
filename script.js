@@ -103,9 +103,10 @@ function handleButtonPressEvent(inputValue){
                 console.log(calculations.accumulator);
 
                 if(calculations.accumulator%1 !== 0){
-                    let nonNumber = String(calculations.accumulator)
-                                          .split('').map(digit => Number.parseInt(digit));
-                    calculations.firstValue = String(nonNumber).replace(/Nan/g, ".");
+                    // let nonNumber = String(calculations.accumulator)
+                    //                       .split('').map(digit => Number.parseInt(digit));
+                    // calculations.firstValue = String(nonNumber).replace(/Nan/g, ".");
+                    calculations.firstValue = calculations.accumulator
                 } else {
                     calculations.firstValue = String(calculations.accumulator)
                                           .split('').map(digit => Number.parseInt(digit));
