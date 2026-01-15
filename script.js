@@ -1,6 +1,8 @@
 let displayValue = '';
-let calculatorDisplayElement = document.querySelector('#display');
+const calculatorDisplayElement = document.querySelector('#display');
 let operatorSelected = false;
+
+const inputOperator = ['+', '−', '×', '÷'];
 
 const idToValue ={
     'zero': 0,
@@ -27,102 +29,99 @@ let buttonIDArray = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seve
                      'plus', 'minus', 'multiply', 'devide', 'decimal', 'clear', 'equal', 'back'];
 
 let calculations = {
-    firstValue: [],
-    secondValue: [],
+    firstValue: '',
+    secondValue: '',
     operator: '',
     accumulator: 0,
     add: function() {
-        return Number.parseInt(this.firstValue.join('')) + Number.parseInt(this.secondValue.join(''));
+        return Number.parseFloat(this.firstValue) + Number.parseFloat(this.secondValue);
     },
     subtract: function() {
-        return Number.parseInt(this.firstValue.join('')) - Number.parseInt(this.secondValue.join(''));
+        return Number.parseFloat(this.firstValue) - Number.parseFloat(this.secondValue);
     },
     multiply: function () {
-        return Number.parseInt(this.firstValue.join('')) * Number.parseInt(this.secondValue.join(''));
+        return Number.parseFloat(this.firstValue) * Number.parseFloat(this.secondValue);
     },
     devide: function () {
-        return Number.parseInt(this.firstValue.join('')) / Number.parseInt(this.secondValue.join(''));
+        return Number.parseFloat(this.firstValue) / Number.parseFloat(this.secondValue);
+    },
+    calculation: {
+        '+': () => calculations.add(),
+        '−': () => calculations.subtract(),
+        '×': () => calculations.multiply(),
+        '÷': () => calculations.devide()
     },
     operation: function () {
-        switch(this.operator){
-            case '+':
-                return calculations.add();
-                break;
-            case '−':
-                return calculations.subtract();
-                break;
-            case '×':
-                return calculations.multiply();
-                break;
-            case '÷':
-                return calculations.devide();
-                break;
-            default:
-                console.error("No operation was executed!");
-                return;
+        this.accumulator = calculations.calculation[this.operator]();
+
+        if(this.accumulator%1 !== 0){
+            this.firstValue = String(this.accumulator.toFixed(2));
+        } else {
+            this.firstValue = String(this.accumulator.toFixed(0));
         }
+        this.operator = '';
+        this.secondValue = '';
+    },
+    clearAll: function () {
+        calculations.firstValue = '';
+        calculations.secondValue = '';
+        calculations.operator = '';
+        calculations.accumulator = 0;  
+        operatorSelected = false; 
     }
 }
 
-function handleButtonPressEvent(inputValue){
+function handleDelete() {
+    if(!operatorSelected){
+        calculations.firstValue = calculations.firstValue.slice(0, -1);
+    } else {
+        calculations.secondValue = calculations.secondValue.slice(0, -1);
+    }
+}
 
-    if(inputValue === 'B'){
-        if(!operatorSelected){
-            calculations.firstValue.pop();
-        } else {
-            calculations.secondValue.pop();
-        }
+function handleDecimal() {
+    if(!operatorSelected){
+        if(calculations.firstValue.includes(".")) return;
+        calculations.firstValue += '.';
+    } else {
+        if(calculations.secondValue.includes(".")) return;
+        calculations.secondValue += '.';
+    }
+}
+
+function handleInteger(value) {
+    if(!operatorSelected){
+        calculations.firstValue += value;
+        return;
+    } else {
+        calculations.secondValue += value;
         return;
     }
+}
 
-    if(Number.isInteger(inputValue)){
-        if(!operatorSelected){
-            calculations['firstValue'].push(inputValue);
-            return;
-        } else {
-            calculations['secondValue'].push(inputValue);
-            return;
-        }
-    } else {
-        operatorSelected = true;
-        switch(inputValue){
-            case '+':
-                calculations.operator = inputValue;
-                break;
-            case '−':
-                calculations.operator = inputValue;
-                break;
-            case '×':
-                calculations.operator = inputValue;
-                break;
-            case '÷':
-                calculations.operator = inputValue;
-                break;
-            case '=':
-                calculations.accumulator = calculations.operation();
-                console.log(calculations.accumulator);
+function handleOperator(value) {
+    if (calculations.operator === '' && operatorSelected === false) calculations.operation();
+    calculations.operator = value;
+}
 
-                if(calculations.accumulator%1 !== 0){
-                    // let nonNumber = String(calculations.accumulator)
-                    //                       .split('').map(digit => Number.parseInt(digit));
-                    // calculations.firstValue = String(nonNumber).replace(/Nan/g, ".");
-                    calculations.firstValue = calculations.accumulator
-                } else {
-                    calculations.firstValue = String(calculations.accumulator)
-                                          .split('').map(digit => Number.parseInt(digit));
-                }
+function handleButtonPressEvent(inputValue){
+    if(inputValue === 'B') return handleDelete();
+    if(inputValue === '.') return handleDecimal();
+    if(Number.isInteger(inputValue)) return handleInteger(inputValue);
+    
+    operatorSelected = true;
+    
+    if (inputOperator.includes(inputValue)) return handleOperator(inputValue);
 
-                calculations.secondValue = [];
-                break;
-            case 'C':
-                calculations.firstValue = [];
-                calculations.secondValue = [];
-                calculations.operator = '';
-                calculations.accumulator = 0;   
-                break;
-            default:
-                console.log("Nothing");
-        }
+    switch(inputValue){
+        case '=':
+            calculations.operation();
+            break;
+        case 'C':
+            calculations.clearAll();
+            break;
+        default:
+            console.log("Nothing");
     }
 }
 
@@ -133,6 +132,6 @@ buttonIDArray.forEach((id) => {
 
         //Display the value that was just entered
         calculatorDisplayElement.textContent = 
-        `${calculations.firstValue.join('')} ${calculations.operator} ${calculations.secondValue.join('')}`;
+        `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
     });
 });
