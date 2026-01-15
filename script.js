@@ -14,9 +14,9 @@ const idToValue ={
     'eight': 8,
     'nine': 9,
     'plus': '+',
-    'minus': '-',
-    'multiply': 'x',
-    'devide': '/',
+    'minus': '−',
+    'multiply': '×',
+    'devide': '÷',
     'equal': '=',
     'decimal': '.',
     'clear': 'C',
@@ -32,29 +32,29 @@ let calculations = {
     operator: '',
     accumulator: 0,
     add: function() {
-        return this.firstValue + this.secondValue;
+        return Number.parseInt(this.firstValue.join('')) + Number.parseInt(this.secondValue.join(''));
     },
     subtract: function() {
-        return this.firstValue - this.secondValue;
+        return Number.parseInt(this.firstValue.join('')) - Number.parseInt(this.secondValue.join(''));
     },
     multiply: function () {
-        return this.firstValue * this.secondValue;
+        return Number.parseInt(this.firstValue.join('')) * Number.parseInt(this.secondValue.join(''));
     },
     devide: function () {
-        return this.firstValue / this.secondValue;
+        return Number.parseInt(this.firstValue.join('')) / Number.parseInt(this.secondValue.join(''));
     },
     operation: function () {
         switch(this.operator){
             case '+':
                 return calculations.add();
                 break;
-            case '-':
+            case '−':
                 return calculations.subtract();
                 break;
-            case '*':
+            case '×':
                 return calculations.multiply();
                 break;
-            case '/':
+            case '÷':
                 return calculations.devide();
                 break;
             default:
@@ -68,7 +68,6 @@ function handleButtonPressEvent(inputValue){
     if(Number.isInteger(inputValue)){
         if(!operatorSelected){
             calculations['firstValue'].push(inputValue);
-            console.log(calculations.firstValue);
         } else {
             calculations['secondValue'].push(inputValue);
         }
@@ -78,6 +77,25 @@ function handleButtonPressEvent(inputValue){
         switch(inputValue){
             case '+':
                 calculations.operator = inputValue;
+                break;
+            case '−':
+                calculations.operator = inputValue;
+                break;
+            case '×':
+                calculations.operator = inputValue;
+                break;
+            case '÷':
+                calculations.operator = inputValue;
+                break;
+            case '=':
+                calculations.accumulator = calculations.operation();
+                console.log(calculations.accumulator);
+                calculations.firstValue = String(calculations.accumulator)
+                                          .split('').map(digit => Number.parseInt(digit));
+                calculations.secondValue = [];
+                break;
+            default:
+                console.log("Nothing");
         }
     }
 }
@@ -88,7 +106,6 @@ buttonIDArray.forEach((id) => {
         handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
 
         //Display the value that was just entered
-        console.log(`${calculations.firstValue.join('')} ${calculations.operator} ${calculations.secondValue.join('')}`)
         calculatorDisplayElement.textContent = 
         `${calculations.firstValue.join('')} ${calculations.operator} ${calculations.secondValue.join('')}`;
     });
