@@ -1,6 +1,7 @@
 let displayValue = '';
 const calculatorDisplayElement = document.querySelector('#display');
 let operatorSelected = false;
+let devideByZero = false;
 
 const inputOperator = ['+', '−', '×', '÷'];
 
@@ -25,14 +26,13 @@ const idToValue ={
     'back': 'B'
 }
 
-let buttonIDArray = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 
-                     'plus', 'minus', 'multiply', 'devide', 'decimal', 'clear', 'equal', 'back'];
-
 let calculations = {
-    firstValue: '',
+
+    firstValue:  '',
     secondValue: '',
-    operator: '',
-    accumulator: 0,
+    operator:    '',
+    accumulator:  0,
+
     add: function() {
         return Number.parseFloat(this.firstValue) + Number.parseFloat(this.secondValue);
     },
@@ -52,6 +52,11 @@ let calculations = {
         '÷': () => calculations.devide()
     },
     operation: function () {
+        if(this.secondValue === '0' && this.operator === "÷"){
+            devideByZero = true;
+            return;
+        }
+
         this.accumulator = calculations.calculation[this.operator]();
 
         if(this.accumulator%1 !== 0){
@@ -72,6 +77,14 @@ let calculations = {
 }
 
 function handleDelete() {
+    if(calculations.operator !== '' && calculations.secondValue === ''){
+        if(operatorSelected === true && calculations.accumulator === 0){
+            operatorSelected = false;
+        }
+        calculations.operator = '';
+        return;
+    }
+
     if(!operatorSelected){
         calculations.firstValue = calculations.firstValue.slice(0, -1);
     } else {
@@ -108,9 +121,7 @@ function handleOperator(value) {
 }
 
 function handleEqual(){
-    if(calculations.secondValue === '0' && calculations.operator === "÷"){
-        console.log("We got here!");
-        displayValue = 'Hmmmm';
+    if(calculations.operator === ''){
         return;
     }
     calculations.operation();
@@ -134,14 +145,16 @@ function handleButtonPressEvent(inputValue){
     }
 }
 
-buttonIDArray.forEach((id) => {
+Object.keys(idToValue).forEach((id) => {
     let currentButton = document.querySelector(`#${id}`);
     currentButton.addEventListener("click", () => {
         handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
 
-        //Display the value that was just entered
-        if(calculations.secondValue === '0' && calculations.operator === "÷"){
-            calculatorDisplayElement.textContent = displayValue;
+        //Display
+        if(devideByZero){
+            calculatorDisplayElement.textContent = "Hmmm";
+            calculations.clearAll();
+            devideByZero = false;
         } else {
             calculatorDisplayElement.textContent = 
         `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
