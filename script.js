@@ -106,6 +106,8 @@ function handleInteger(value) {
     if(!operatorSelected){
         calculations.firstValue += value;
         return;
+    } else if(operatorSelected && calculations.operator === '') {
+        return;
     } else {
         calculations.secondValue += value;
         return;
@@ -113,7 +115,7 @@ function handleInteger(value) {
 }
 
 function handleOperator(value) {
-    if (operatorSelected === true){
+    if (operatorSelected === true && calculations.secondValue !== ''){
         calculations.operation();
     } 
     operatorSelected = true;            
@@ -125,6 +127,8 @@ function handleEqual(){
         return;
     }
     calculations.operation();
+    calculations.operator = '';
+    calculations.secondValue = '';
 }
 
 function handleButtonPressEvent(inputValue){
