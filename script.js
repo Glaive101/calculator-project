@@ -2,6 +2,8 @@ let displayValue = '';
 const calculatorDisplayElement = document.querySelector('#display');
 let operatorSelected = false;
 let devideByZero = false;
+let equalsFlag = false;
+let clearFlag = false;
 
 const inputOperator = ['+', '−', '×', '÷'];
 
@@ -32,6 +34,7 @@ let calculations = {
     secondValue: '',
     operator:    '',
     accumulator:  0,
+    accumulatorStorage : 0,
 
     add: function() {
         return Number.parseFloat(this.firstValue) + Number.parseFloat(this.secondValue);
@@ -68,11 +71,13 @@ let calculations = {
         this.secondValue = '';
     },
     clearAll: function () {
-        calculations.firstValue = '';
-        calculations.secondValue = '';
-        calculations.operator = '';
+        this.firstValue = '';
+        this.secondValue = '';
+        this.operator = '';
+        this.accumulatorStorage = this.accumulator
         calculations.accumulator = 0;  
         operatorSelected = false; 
+        clearFlag = true;
     }
 }
 
@@ -115,6 +120,8 @@ function handleInteger(value) {
 }
 
 function handleOperator(value) {
+    if(!operatorSelected && calculations.firstValue === '') return;
+    if(calculations.firstValue === '' && calculations.secondValue === '') return;
     if (operatorSelected === true && calculations.secondValue !== ''){
         calculations.operation();
     } 
@@ -123,12 +130,9 @@ function handleOperator(value) {
 }
 
 function handleEqual(){
-    if(calculations.operator === ''){
-        return;
-    }
+    if(calculations.operator === '' || calculations.firstValue === '' || calculations.secondValue === '') return;
     calculations.operation();
-    calculations.operator = '';
-    calculations.secondValue = '';
+    equalsFlag = true;
 }
 
 function handleButtonPressEvent(inputValue){
@@ -149,19 +153,35 @@ function handleButtonPressEvent(inputValue){
     }
 }
 
+function display() {
+    if(clearFlag) {
+        calculatorDisplayElement.textContent = '';
+        clearFlag = false;
+    } else if(devideByZero){
+        calculatorDisplayElement.textContent = "Hmmm";
+        calculations.clearAll();
+        clearFlag = false;
+        devideByZero = false;
+    } else if(equalsFlag){
+        calculations.clearAll();
+        calculatorDisplayElement.textContent = String(calculations.accumulatorStorage);
+        equalsFlag = false;
+        clearFlag = false;
+    } else if(calculations.firstValue === '' && calculations.secondValue === '' && calculations.operator !== ''){
+        calculatorDisplayElement.textContent = '';
+    // } else if(calculations.firstValue === '' && calculations.secondValue === '') {
+    //     console.log("This was reached");
+    //     calculatorDisplayElement.textContent = String(calculations.accumulator);
+    } else {
+        calculatorDisplayElement.textContent = 
+    `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
+    }
+}
+
 Object.keys(idToValue).forEach((id) => {
     let currentButton = document.querySelector(`#${id}`);
     currentButton.addEventListener("click", () => {
         handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
-
-        //Display
-        if(devideByZero){
-            calculatorDisplayElement.textContent = "Hmmm";
-            calculations.clearAll();
-            devideByZero = false;
-        } else {
-            calculatorDisplayElement.textContent = 
-        `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
-        }
+        display();
     });
 });
