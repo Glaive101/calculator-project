@@ -100,22 +100,31 @@ function handleInteger(value) {
 }
 
 function handleOperator(value) {
-    if (calculations.operator === '' && operatorSelected === false) calculations.operation();
+    if (operatorSelected === true){
+        calculations.operation();
+    } 
+    operatorSelected = true;            
     calculations.operator = value;
+}
+
+function handleEqual(){
+    if(calculations.secondValue === '0' && calculations.operator === "÷"){
+        console.log("We got here!");
+        displayValue = 'Hmmmm';
+        return;
+    }
+    calculations.operation();
 }
 
 function handleButtonPressEvent(inputValue){
     if(inputValue === 'B') return handleDelete();
     if(inputValue === '.') return handleDecimal();
     if(Number.isInteger(inputValue)) return handleInteger(inputValue);
-    
-    operatorSelected = true;
-    
     if (inputOperator.includes(inputValue)) return handleOperator(inputValue);
 
     switch(inputValue){
         case '=':
-            calculations.operation();
+            handleEqual();
             break;
         case 'C':
             calculations.clearAll();
@@ -131,7 +140,11 @@ buttonIDArray.forEach((id) => {
         handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
 
         //Display the value that was just entered
-        calculatorDisplayElement.textContent = 
+        if(calculations.secondValue === '0' && calculations.operator === "÷"){
+            calculatorDisplayElement.textContent = displayValue;
+        } else {
+            calculatorDisplayElement.textContent = 
         `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
+        }
     });
 });
