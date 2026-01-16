@@ -1,13 +1,8 @@
-let displayValue = '';
 const calculatorDisplayElement = document.querySelector('#display');
-let operatorSelected = false;
-let devideByZero = false;
-let equalsFlag = false;
-let clearFlag = false;
 
 const inputOperator = ['+', '−', '×', '÷'];
 
-const idToValue ={
+const idToValue = {
     'zero': 0,
     'one': 1,
     'two': 2,
@@ -34,7 +29,7 @@ let calculations = {
     secondValue: '',
     operator:    '',
     accumulator:  0,
-    accumulatorStorage : 0,
+    accumulatorPrintStorage: 0,
 
     add: function() {
         return Number.parseFloat(this.firstValue) + Number.parseFloat(this.secondValue);
@@ -56,11 +51,11 @@ let calculations = {
     },
     operation: function () {
         if(this.secondValue === '0' && this.operator === "÷"){
-            devideByZero = true;
             return;
         }
 
         this.accumulator = calculations.calculation[this.operator]();
+        this.accumulatorPrintStorage = this.accumulator; 
 
         if(this.accumulator%1 !== 0){
             this.firstValue = String(this.accumulator.toFixed(2));
@@ -74,23 +69,26 @@ let calculations = {
         this.firstValue = '';
         this.secondValue = '';
         this.operator = '';
-        this.accumulatorStorage = this.accumulator
         calculations.accumulator = 0;  
-        operatorSelected = false; 
-        clearFlag = true;
+        operatorSelected = false;
     }
+}
+
+let mathDisplay = {
+    first: `${calculations.firstValue}`,
+    firstOperator: `${calculations.firstValue} ${calculations.operator}`,
+    firstOperatorSecond: `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`,
+    equal: `${calculations.accumulator}`,
+    clear: ''
 }
 
 function handleDelete() {
     if(calculations.operator !== '' && calculations.secondValue === ''){
-        if(operatorSelected === true && calculations.accumulator === 0){
-            operatorSelected = false;
-        }
         calculations.operator = '';
         return;
     }
 
-    if(!operatorSelected){
+    if(calculations.firstValue !== '' && calculations.secondValue === '' && calculations.operator === ''){
         calculations.firstValue = calculations.firstValue.slice(0, -1);
     } else {
         calculations.secondValue = calculations.secondValue.slice(0, -1);
@@ -98,7 +96,7 @@ function handleDelete() {
 }
 
 function handleDecimal() {
-    if(!operatorSelected){
+    if(calculations.operator === '' && calculations.secondValue === ''){
         if(calculations.firstValue.includes(".")) return;
         calculations.firstValue += '.';
     } else {
@@ -108,31 +106,31 @@ function handleDecimal() {
 }
 
 function handleInteger(value) {
-    if(!operatorSelected){
+    if(calculations.operator === '' && calculations.secondValue === ''){
         calculations.firstValue += value;
-        return;
-    } else if(operatorSelected && calculations.operator === '') {
+    } else if(calculations.operator === '') {
         return;
     } else {
         calculations.secondValue += value;
-        return;
     }
 }
 
 function handleOperator(value) {
-    if(!operatorSelected && calculations.firstValue === '') return;
-    if(calculations.firstValue === '' && calculations.secondValue === '') return;
-    if (operatorSelected === true && calculations.secondValue !== ''){
-        calculations.operation();
-    } 
-    operatorSelected = true;            
-    calculations.operator = value;
+    if(calculations.firstValue !== '' 
+        && calculations.secondValue !== '' 
+        && calculations.operator !== '')
+            calculations.operation();
+
+    if(calculations.firstValue !== ''){
+        calculations.operator = value;
+    }
 }
 
 function handleEqual(){
-    if(calculations.operator === '' || calculations.firstValue === '' || calculations.secondValue === '') return;
-    calculations.operation();
-    equalsFlag = true;
+    if(calculations.operator !== '' 
+        || calculations.firstValue !== '' 
+        || calculations.secondValue !== '') 
+            calculations.operation();
 }
 
 function handleButtonPressEvent(inputValue){
@@ -144,6 +142,7 @@ function handleButtonPressEvent(inputValue){
     switch(inputValue){
         case '=':
             handleEqual();
+            calculations.clearAll();
             break;
         case 'C':
             calculations.clearAll();
@@ -153,35 +152,28 @@ function handleButtonPressEvent(inputValue){
     }
 }
 
-function display() {
-    if(clearFlag) {
-        calculatorDisplayElement.textContent = '';
-        clearFlag = false;
-    } else if(devideByZero){
-        calculatorDisplayElement.textContent = "Hmmm";
+function whatToDisplay(buttonID) {
+    if(buttonID === 'C')
+        return '';
+    if(calculations.secondValue === '0' && calculations.operator === '÷'){
         calculations.clearAll();
-        clearFlag = false;
-        devideByZero = false;
-    } else if(equalsFlag){
-        calculations.clearAll();
-        calculatorDisplayElement.textContent = String(calculations.accumulatorStorage);
-        equalsFlag = false;
-        clearFlag = false;
-    } else if(calculations.firstValue === '' && calculations.secondValue === '' && calculations.operator !== ''){
-        calculatorDisplayElement.textContent = '';
-    // } else if(calculations.firstValue === '' && calculations.secondValue === '') {
-    //     console.log("This was reached");
-    //     calculatorDisplayElement.textContent = String(calculations.accumulator);
-    } else {
-        calculatorDisplayElement.textContent = 
-    `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
+        return 'Hmmm';
     }
+    if(calculations.firstValue !== '' && calculations.secondValue === '' && calculations.operator === '')
+        return `${calculations.firstValue}`;
+    if(calculations.firstValue !== '' && calculations.secondValue === '' && calculations.operator !== '')
+        return `${calculations.firstValue} ${calculations.operator}`;
+    if(calculations.firstValue !== '' && calculations.secondValue !== '' && calculations.operator !== '')
+        return `${calculations.firstValue} ${calculations.operator} ${calculations.secondValue}`;
+    if(calculations.firstValue === '' && calculations.secondValue === '' 
+        && calculations.operator === '' && buttonID === '=')
+            return `${calculations.accumulatorPrintStorage}`;
 }
 
 Object.keys(idToValue).forEach((id) => {
     let currentButton = document.querySelector(`#${id}`);
     currentButton.addEventListener("click", () => {
         handleButtonPressEvent(idToValue[currentButton.getAttribute("id")]);
-        display();
+        calculatorDisplayElement.textContent = whatToDisplay(idToValue[currentButton.getAttribute("id")]);
     });
 });
